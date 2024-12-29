@@ -11,6 +11,7 @@ g++ -mwindows -m64 -static -Wall -Wextra Internet.cpp ^
  ..\Classes\DroppedFilesClass.cpp ^
  ..\Classes\EditWindowClass.cpp ^
  ..\Classes\FontClass.cpp ^
+ ..\Classes\InternetClass.cpp ^
  ..\Classes\ListBoxWindowClass.cpp ^
  ..\Classes\MenuClass.cpp ^
  ..\Classes\MessageClass.cpp ^
@@ -18,4 +19,4 @@ g++ -mwindows -m64 -static -Wall -Wextra Internet.cpp ^
  ..\Classes\WindowClass.cpp ^
  ..\Classes\WindowClassClass.cpp ^
  ^
- Resource.o -o Internet.exe
+ Resource.o -o Internet.exe -lwininet

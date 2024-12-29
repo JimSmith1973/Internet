@@ -15,6 +15,7 @@
 #include "..\Classes\DroppedFilesClass.h"
 #include "..\Classes\EditWindowClass.h"
 #include "..\Classes\FontClass.h"
+#include "..\Classes\InternetClass.h"
 #include "..\Classes\ListBoxWindowClass.h"
 #include "..\Classes\MessageClass.h"
 #include "..\Classes\MenuClass.h"

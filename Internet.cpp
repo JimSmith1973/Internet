@@ -3,6 +3,7 @@
 #include "Internet.h"
 
 // Global variables
+Internet g_internet;
 EditWindow g_editWindow;
 ButtonWindow g_buttonWindow;
 ListBoxWindow g_listBoxWindow;
@@ -247,8 +248,43 @@ LRESULT CALLBACK MainWindowProcedure( HWND hWndMain, UINT uMessage, WPARAM wPara
 					{
 						// Successfully got url from edit window
 
-						// Display url
-						MessageBox( hWndMain, lpszUrl, INFORMATION_MESSAGE_CAPTION, ( MB_OK | MB_ICONINFORMATION ) );
+						// Allocate string memory
+						LPTSTR lpszLocalFilePath = new char[ STRING_LENGTH + sizeof( char ) ];
+						LPTSTR lpszStatusMessage = new char[ STRING_LENGTH + sizeof( char ) ];
+
+						// Format status message
+						wsprintf( lpszStatusMessage, INTERNET_CLASS_DOWNLOADING_STATUS_MESSAGE_FORMAT_STRING, lpszUrl );
+
+						// Show status message on status bar window
+						g_statusBarWindow.SetText( lpszStatusMessage );
+
+						// Download url to local file
+						if( g_internet.DownloadFile( lpszUrl, lpszLocalFilePath ) )
+						{
+							// Successfully downloaded url to local file
+
+							// Format status message
+							wsprintf( lpszStatusMessage, INTERNET_CLASS_SUCCESSFULLY_DOWNLOADED_STATUS_MESSAGE_FORMAT_STRING, lpszUrl, lpszLocalFilePath );
+
+							// Display url
+							MessageBox( hWndMain, lpszUrl, INFORMATION_MESSAGE_CAPTION, ( MB_OK | MB_ICONINFORMATION ) );
+
+						} // End of successfully downloaded url to local file
+						else
+						{
+							// Unable to download url to local file
+
+							// Format status message
+							wsprintf( lpszStatusMessage, INTERNET_CLASS_UNABLE_TO_DOWNLOAD_STATUS_MESSAGE_FORMAT_STRING, lpszUrl );
+
+						} // End of unable to download url to local file
+
+						// Show status message on status bar window
+						g_statusBarWindow.SetText( lpszStatusMessage );
+
+						// Free string memory
+						delete [] lpszLocalFilePath;
+						delete [] lpszStatusMessage;
 
 					} // End of successfully got url from edit window
 
@@ -442,79 +478,95 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow )
 {
 	Message message;
 
-	WindowClass mainWindowClass;
-
-	// Initialise main window class
-	mainWindowClass.Initialise( MAIN_WINDOW_CLASS_NAME, hInstance, MainWindowProcedure, MAIN_WINDOW_CLASS_MENU_NAME );
-
-	// Register main window class
-	if( mainWindowClass.Register() )
+	// Connect to internet
+	if( g_internet.Connect() )
 	{
-		// Successfully registered main window class
-		Window mainWindow;
+		// Successfully connected to internet
+		WindowClass mainWindowClass;
 
-		// Create main window
-		if( mainWindow.Create( MAIN_WINDOW_CLASS_NAME, NULL, hInstance, MAIN_WINDOW_TEXT ) )
+		// Initialise main window class
+		mainWindowClass.Initialise( MAIN_WINDOW_CLASS_NAME, hInstance, MainWindowProcedure, MAIN_WINDOW_CLASS_MENU_NAME );
+
+		// Register main window class
+		if( mainWindowClass.Register() )
 		{
-			// Successfully created main window
-			Menu systemMenu;
-			ArgumentList argumentList;
+			// Successfully registered main window class
+			Window mainWindow;
 
-			// Get system menu
-			systemMenu.GetSystem( mainWindow );
-
-			// Add separator item to system menu
-			systemMenu.InsertSeparator( MENU_CLASS_SYSTEM_MENU_SEPARATOR_ITEM_POSITION );
-
-			// Add about item to system menu
-			systemMenu.InsertItem( MENU_CLASS_SYSTEM_MENU_ABOUT_ITEM_POSITION, IDM_HELP_ABOUT, MENU_CLASS_SYSTEM_MENU_ABOUT_ITEM_TEXT );
-
-			// Get argument list
-			if( argumentList.Get() )
+			// Create main window
+			if( mainWindow.Create( MAIN_WINDOW_CLASS_NAME, NULL, hInstance, MAIN_WINDOW_TEXT ) )
 			{
-				// Successfully got argument list
+				// Successfully created main window
+				Menu systemMenu;
+				ArgumentList argumentList;
 
-				// Process arguments
-				argumentList.ProcessArguments( &OpenFileFunction );
+				// Get system menu
+				systemMenu.GetSystem( mainWindow );
 
-			} // End of successfully got argument list
+				// Add separator item to system menu
+				systemMenu.InsertSeparator( MENU_CLASS_SYSTEM_MENU_SEPARATOR_ITEM_POSITION );
 
-			// Show main window
-			mainWindow.Show( nCmdShow );
+				// Add about item to system menu
+				systemMenu.InsertItem( MENU_CLASS_SYSTEM_MENU_ABOUT_ITEM_POSITION, IDM_HELP_ABOUT, MENU_CLASS_SYSTEM_MENU_ABOUT_ITEM_TEXT );
 
-			// Update main window
-			mainWindow.Update();
+				// Get argument list
+				if( argumentList.Get() )
+				{
+					// Successfully got argument list
 
-			// Message loop
-			while( message.Get() > 0 )
+					// Process arguments
+					argumentList.ProcessArguments( &OpenFileFunction );
+
+				} // End of successfully got argument list
+
+				// Show main window
+				mainWindow.Show( nCmdShow );
+
+				// Update main window
+				mainWindow.Update();
+
+				// Message loop
+				while( message.Get() > 0 )
+				{
+					// Translate message
+					message.Translate();
+
+					// Dispatch message
+					message.Dispatch();
+
+				}; // End of message loop
+
+			} // End of successfully created main window
+			else
 			{
-				// Translate message
-				message.Translate();
+				// Unable to create main window
 
-				// Dispatch message
-				message.Dispatch();
+				// Display error message
+				MessageBox( NULL, WINDOW_CLASS_UNABLE_TO_CREATE_WINDOW_ERROR_MESSAGE, ERROR_MESSAGE_CAPTION, ( MB_OK | MB_ICONERROR ) );
 
-			}; // End of message loop
+			} // End of unable to create main window
 
-		} // End of successfully created main window
+		} // End of successfully registered main window class
 		else
 		{
-			// Unable to create main window
+			// Unable to register main window class
 
 			// Display error message
-			MessageBox( NULL, WINDOW_CLASS_UNABLE_TO_CREATE_WINDOW_ERROR_MESSAGE, ERROR_MESSAGE_CAPTION, ( MB_OK | MB_ICONERROR ) );
+			MessageBox( NULL, WINDOW_CLASS_CLASS_UNABLE_TO_REGISTER_ERROR_MESSAGE, ERROR_MESSAGE_CAPTION, ( MB_OK | MB_ICONERROR ) );
 
-		} // End of unable to create main window
+		} // End of unable to register main window class
 
-	} // End of successfully registered main window class
+	} // End of successfully connected to internet
 	else
 	{
-		// Unable to register main window class
+		// Unable to connect to internet
 
 		// Display error message
-		MessageBox( NULL, WINDOW_CLASS_CLASS_UNABLE_TO_REGISTER_ERROR_MESSAGE, ERROR_MESSAGE_CAPTION, ( MB_OK | MB_ICONERROR ) );
+		MessageBox( NULL, INTERNET_CLASS_UNABLE_TO_CONNECT_TO_INTERNET_ERROR_MESSAGE, ERROR_MESSAGE_CAPTION, ( MB_OK | MB_ICONERROR ) );
 
-	} // End of unable to register main window class
+	} // End of unable to connect to internet
+
+
 
 	return message;
 
