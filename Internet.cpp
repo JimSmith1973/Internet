@@ -323,7 +323,7 @@ LRESULT CALLBACK MainWindowProcedure( HWND hWndMain, UINT uMessage, WPARAM wPara
 									LPTSTR lpszStatusMessage = new char[ STRING_LENGTH ];
 
 									// Process tags in local file
-									nTagCount = localFile.ProcessTags( &TagFunction );
+									nTagCount = localFile.ProcessTags( HTML_FILE_CLASS_ANCHOR_TAG_NAME, HTML_FILE_CLASS_ANCHOR_TAG_ATTRIBUTE, &TagFunction );
 
 									// Format status message
 									wsprintf( lpszStatusMessage, HTML_FILE_CLASS_PROCESS_TAGS_STATUS_MESSAGE_FORMAT_STRING, lpszUrl, nTagCount );
