@@ -305,62 +305,25 @@ LRESULT CALLBACK MainWindowProcedure( HWND hWndMain, UINT uMessage, WPARAM wPara
 							if( localFile.CreateRead( lpszLocalFilePath ) )
 							{
 								// Successfully opened local file for reading
-								DWORD dwLocalFileSize;
 
-								// Get local file size
-								dwLocalFileSize = localFile.GetSize();
-
-								// Ensure that local file size was got
-								if( dwLocalFileSize != INVALID_FILE_SIZE )
+								// Read local file
+								if( localFile.Read() )
 								{
-									// Successfully got local file size
+									// Successfully read local file
 
-									// Allocate string memory
-									LPTSTR lpszLocalFileText = new char[ dwLocalFileSize + sizeof( char ) ];
+									// Display local file
+									localFile.DisplayText( hWndMain, lpszUrl );
 
-									// Read local file text
-									if( localFile.Read( lpszLocalFileText, dwLocalFileSize ) )
-									{
-										// Successfully read local file text
-
-										// Terminate local file text
-										lpszLocalFilePath[ dwLocalFileSize ] = ( char )NULL;
-
-										// Display url
-										MessageBox( hWndMain, lpszLocalFileText, lpszUrl, ( MB_OK | MB_ICONINFORMATION ) );
-
-									} // End of successfully read local file text
-									else
-									{
-										// Unable to read local local file text
-
-										// Allocate string memory
-										LPTSTR lpszErrorMessage = new char[ STRING_LENGTH ];
-
-										// Format error message
-										wsprintf( lpszErrorMessage, FILE_CLASS_UNABLE_TO_READ_FILE_ERROR_MESSAGE_FORMAT_STRING, lpszLocalFilePath );
-
-										// Display error message
-										MessageBox( hWndMain, lpszErrorMessage, ERROR_MESSAGE_CAPTION, ( MB_OK | MB_ICONERROR ) );
-
-										// Free string memory
-										delete [] lpszErrorMessage;
-
-									} // End of unable to read local file text
-
-									// Free string memory
-									delete [] lpszLocalFileText;
-
-								} // End of successfully got local file size
+								} // End of successfully read local file
 								else
 								{
-									// Unable to get local file size
+									// Unable to read local local file text
 
 									// Allocate string memory
 									LPTSTR lpszErrorMessage = new char[ STRING_LENGTH ];
 
 									// Format error message
-									wsprintf( lpszErrorMessage, FILE_CLASS_UNABLE_TO_GET_FILE_SIZE_ERROR_MESSAGE_FORMAT_STRING, lpszLocalFilePath );
+									wsprintf( lpszErrorMessage, FILE_CLASS_UNABLE_TO_READ_FILE_ERROR_MESSAGE_FORMAT_STRING, lpszLocalFilePath );
 
 									// Display error message
 									MessageBox( hWndMain, lpszErrorMessage, ERROR_MESSAGE_CAPTION, ( MB_OK | MB_ICONERROR ) );
@@ -368,7 +331,7 @@ LRESULT CALLBACK MainWindowProcedure( HWND hWndMain, UINT uMessage, WPARAM wPara
 									// Free string memory
 									delete [] lpszErrorMessage;
 
-								} // End of unable to get local file size
+								} // End of unable to read local file text
 
 								// Close local file
 								localFile.Close();
