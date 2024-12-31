@@ -9,6 +9,50 @@ ButtonWindow g_buttonWindow;
 ListBoxWindow g_listBoxWindow;
 StatusBarWindow g_statusBarWindow;
 
+BOOL DownloadFile( LPCTSTR lpszUrl, LPTSTR lpszLocalFilePath )
+{
+	BOOL bResult = FALSE;
+
+	// Allocate string memory
+	LPTSTR lpszStatusMessage = new char[ STRING_LENGTH + sizeof( char ) ];
+
+	// Format status message
+	wsprintf( lpszStatusMessage, INTERNET_CLASS_DOWNLOADING_STATUS_MESSAGE_FORMAT_STRING, lpszUrl );
+
+	// Show status message on status bar window
+	g_statusBarWindow.SetText( lpszStatusMessage );
+
+	// Download url to local file
+	if( g_internet.DownloadFile( lpszUrl, lpszLocalFilePath ) )
+	{
+		// Successfully downloaded url to local file
+
+		// Format status message
+		wsprintf( lpszStatusMessage, INTERNET_CLASS_SUCCESSFULLY_DOWNLOADED_STATUS_MESSAGE_FORMAT_STRING, lpszUrl, lpszLocalFilePath );
+
+		// Update return value
+		bResult = TRUE;
+
+	} // End of successfully downloaded url to local file
+	else
+	{
+		// Unable to download url to local file
+
+		// Format status message
+		wsprintf( lpszStatusMessage, INTERNET_CLASS_UNABLE_TO_DOWNLOAD_STATUS_MESSAGE_FORMAT_STRING, lpszUrl );
+
+	} // End of unable to download url to local file
+
+	// Show status message on status bar window
+	g_statusBarWindow.SetText( lpszStatusMessage );
+
+	// Free string memory
+	delete [] lpszStatusMessage;
+
+	return bResult;
+
+} // End of function DownloadFile
+
 void EditWindowUpdateFunction( int nTextLength )
 {
 	// See if edit window contains text
@@ -250,41 +294,108 @@ LRESULT CALLBACK MainWindowProcedure( HWND hWndMain, UINT uMessage, WPARAM wPara
 
 						// Allocate string memory
 						LPTSTR lpszLocalFilePath = new char[ STRING_LENGTH + sizeof( char ) ];
-						LPTSTR lpszStatusMessage = new char[ STRING_LENGTH + sizeof( char ) ];
-
-						// Format status message
-						wsprintf( lpszStatusMessage, INTERNET_CLASS_DOWNLOADING_STATUS_MESSAGE_FORMAT_STRING, lpszUrl );
-
-						// Show status message on status bar window
-						g_statusBarWindow.SetText( lpszStatusMessage );
 
 						// Download url to local file
-						if( g_internet.DownloadFile( lpszUrl, lpszLocalFilePath ) )
+						if( DownloadFile( lpszUrl, lpszLocalFilePath ) )
 						{
 							// Successfully downloaded url to local file
+							File localFile;
 
-							// Format status message
-							wsprintf( lpszStatusMessage, INTERNET_CLASS_SUCCESSFULLY_DOWNLOADED_STATUS_MESSAGE_FORMAT_STRING, lpszUrl, lpszLocalFilePath );
+							// Open local file for reading
+							if( localFile.CreateRead( lpszLocalFilePath ) )
+							{
+								// Successfully opened local file for reading
+								DWORD dwLocalFileSize;
 
-							// Display url
-							MessageBox( hWndMain, lpszUrl, INFORMATION_MESSAGE_CAPTION, ( MB_OK | MB_ICONINFORMATION ) );
+								// Get local file size
+								dwLocalFileSize = localFile.GetSize();
+
+								// Ensure that local file size was got
+								if( dwLocalFileSize != INVALID_FILE_SIZE )
+								{
+									// Successfully got local file size
+
+									// Allocate string memory
+									LPTSTR lpszLocalFileText = new char[ dwLocalFileSize + sizeof( char ) ];
+
+									// Read local file text
+									if( localFile.Read( lpszLocalFileText, dwLocalFileSize ) )
+									{
+										// Successfully read local file text
+
+										// Terminate local file text
+										lpszLocalFilePath[ dwLocalFileSize ] = ( char )NULL;
+
+										// Display url
+										MessageBox( hWndMain, lpszLocalFileText, lpszUrl, ( MB_OK | MB_ICONINFORMATION ) );
+
+									} // End of successfully read local file text
+									else
+									{
+										// Unable to read local local file text
+
+										// Allocate string memory
+										LPTSTR lpszErrorMessage = new char[ STRING_LENGTH ];
+
+										// Format error message
+										wsprintf( lpszErrorMessage, FILE_CLASS_UNABLE_TO_READ_FILE_ERROR_MESSAGE_FORMAT_STRING, lpszLocalFilePath );
+
+										// Display error message
+										MessageBox( hWndMain, lpszErrorMessage, ERROR_MESSAGE_CAPTION, ( MB_OK | MB_ICONERROR ) );
+
+										// Free string memory
+										delete [] lpszErrorMessage;
+
+									} // End of unable to read local file text
+
+									// Free string memory
+									delete [] lpszLocalFileText;
+
+								} // End of successfully got local file size
+								else
+								{
+									// Unable to get local file size
+
+									// Allocate string memory
+									LPTSTR lpszErrorMessage = new char[ STRING_LENGTH ];
+
+									// Format error message
+									wsprintf( lpszErrorMessage, FILE_CLASS_UNABLE_TO_GET_FILE_SIZE_ERROR_MESSAGE_FORMAT_STRING, lpszLocalFilePath );
+
+									// Display error message
+									MessageBox( hWndMain, lpszErrorMessage, ERROR_MESSAGE_CAPTION, ( MB_OK | MB_ICONERROR ) );
+
+									// Free string memory
+									delete [] lpszErrorMessage;
+
+								} // End of unable to get local file size
+
+								// Close local file
+								localFile.Close();
+
+							} // End of successfully opened local file for reading
+							else
+							{
+								// Unable to open local file for reading
+
+								// Allocate string memory
+								LPTSTR lpszErrorMessage = new char[ STRING_LENGTH ];
+
+								// Format error message
+								wsprintf( lpszErrorMessage, FILE_CLASS_UNABLE_TO_OPEN_FILE_ERROR_MESSAGE_FORMAT_STRING, lpszLocalFilePath );
+
+								// Display error message
+								MessageBox( hWndMain, lpszErrorMessage, ERROR_MESSAGE_CAPTION, ( MB_OK | MB_ICONERROR ) );
+
+								// Free string memory
+								delete [] lpszErrorMessage;
+
+							} // End of unable to open local file for reading
 
 						} // End of successfully downloaded url to local file
-						else
-						{
-							// Unable to download url to local file
-
-							// Format status message
-							wsprintf( lpszStatusMessage, INTERNET_CLASS_UNABLE_TO_DOWNLOAD_STATUS_MESSAGE_FORMAT_STRING, lpszUrl );
-
-						} // End of unable to download url to local file
-
-						// Show status message on status bar window
-						g_statusBarWindow.SetText( lpszStatusMessage );
 
 						// Free string memory
 						delete [] lpszLocalFilePath;
-						delete [] lpszStatusMessage;
 
 					} // End of successfully got url from edit window
 

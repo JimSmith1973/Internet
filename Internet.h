@@ -14,6 +14,7 @@
 #include "..\Classes\ButtonWindowClass.h"
 #include "..\Classes\DroppedFilesClass.h"
 #include "..\Classes\EditWindowClass.h"
+#include "..\Classes\FileClass.h"
 #include "..\Classes\FontClass.h"
 #include "..\Classes\InternetClass.h"
 #include "..\Classes\ListBoxWindowClass.h"
@@ -34,7 +35,7 @@
 #define BUTTON_WINDOW_HEIGHT													25
 #define BUTTON_WINDOW_ID														WM_USER
 
-#define EDIT_WINDOW_TEXT														"https://news.sky.com/uk"
+#define EDIT_WINDOW_TEXT														"http://www.google.com"
 
 #define ABOUT_MESSAGE_TEXT														"Internet\r\n"						\
 																				"\r\n"								\

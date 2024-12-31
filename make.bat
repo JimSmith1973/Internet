@@ -10,6 +10,7 @@ g++ -mwindows -m64 -static -Wall -Wextra Internet.cpp ^
  ..\Classes\ButtonWindowClass.cpp ^
  ..\Classes\DroppedFilesClass.cpp ^
  ..\Classes\EditWindowClass.cpp ^
+ ..\Classes\FileClass.cpp ^
  ..\Classes\FontClass.cpp ^
  ..\Classes\InternetClass.cpp ^
  ..\Classes\ListBoxWindowClass.cpp ^
