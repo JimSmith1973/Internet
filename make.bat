@@ -12,6 +12,7 @@ g++ -mwindows -m64 -static -Wall -Wextra Internet.cpp ^
  ..\Classes\EditWindowClass.cpp ^
  ..\Classes\FileClass.cpp ^
  ..\Classes\FontClass.cpp ^
+ ..\Classes\HtmlFileClass.cpp ^
  ..\Classes\InternetClass.cpp ^
  ..\Classes\ListBoxWindowClass.cpp ^
  ..\Classes\MenuClass.cpp ^

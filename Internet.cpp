@@ -9,6 +9,13 @@ ButtonWindow g_buttonWindow;
 ListBoxWindow g_listBoxWindow;
 StatusBarWindow g_statusBarWindow;
 
+void TagFunction( LPCTSTR lpszTag )
+{
+	// Add tag to list box window
+	g_listBoxWindow.AddText( lpszTag );
+
+} // End of function TagFunction
+
 BOOL DownloadFile( LPCTSTR lpszUrl, LPTSTR lpszLocalFilePath )
 {
 	BOOL bResult = FALSE;
@@ -299,7 +306,7 @@ LRESULT CALLBACK MainWindowProcedure( HWND hWndMain, UINT uMessage, WPARAM wPara
 						if( DownloadFile( lpszUrl, lpszLocalFilePath ) )
 						{
 							// Successfully downloaded url to local file
-							File localFile;
+							HtmlFile localFile;
 
 							// Open local file for reading
 							if( localFile.CreateRead( lpszLocalFilePath ) )
@@ -310,9 +317,22 @@ LRESULT CALLBACK MainWindowProcedure( HWND hWndMain, UINT uMessage, WPARAM wPara
 								if( localFile.Read() )
 								{
 									// Successfully read local file
+									int nTagCount;
 
-									// Display local file
-									localFile.DisplayText( hWndMain, lpszUrl );
+									// Allocate string memory
+									LPTSTR lpszStatusMessage = new char[ STRING_LENGTH ];
+
+									// Process tags in local file
+									nTagCount = localFile.ProcessTags( &TagFunction );
+
+									// Format status message
+									wsprintf( lpszStatusMessage, HTML_FILE_CLASS_PROCESS_TAGS_STATUS_MESSAGE_FORMAT_STRING, lpszUrl, nTagCount );
+
+									// Show status message on status bar window
+									g_statusBarWindow.SetText( lpszStatusMessage );
+
+									// Free string memory
+									delete [] lpszStatusMessage;
 
 								} // End of successfully read local file
 								else
