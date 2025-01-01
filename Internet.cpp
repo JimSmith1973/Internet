@@ -9,13 +9,51 @@ ButtonWindow g_buttonWindow;
 ListBoxWindow g_listBoxWindow;
 StatusBarWindow g_statusBarWindow;
 
-void TagFunction( LPCTSTR lpszTag, LPCTSTR lpszAttributeValue )
+void TagFunction( LPCTSTR lpszParentUrl, LPCTSTR lpszTag )
 {
+	HtmlFile htmlFile;
+
+	// Allocate string memory
+	LPTSTR lpszTagName = new char[ STRING_LENGTH ];
+
 	// Add tag to list box window
 	g_listBoxWindow.AddText( lpszTag );
 
-	// Add attribute value to list box window
-	g_listBoxWindow.AddText( lpszAttributeValue );
+	// Get tag name
+	if( htmlFile.GetTagName( lpszTag, lpszTagName ) )
+	{
+		// Successfully got tag name
+
+		// Add tag name to list box window
+		g_listBoxWindow.AddText( lpszTagName );
+
+	} // End of successfully got tag name
+
+	// See if this is an anchor tag
+	if( lstrcmpi( lpszTagName, HTML_FILE_CLASS_ANCHOR_TAG_NAME ) == 0 )
+	{
+		// This is an anchor tag
+
+		// Allocate string memory
+		LPTSTR lpszAttributeValue = new char[ STRING_LENGTH ];
+
+		// Get attribute value
+		if( htmlFile.GetAttributeValue( lpszTag, lpszParentUrl, HTML_FILE_CLASS_ANCHOR_TAG_ATTRIBUTE, lpszAttributeValue ) )
+		{
+			// Successfully got attribute value
+
+			// Add attribute value to list box window
+			g_listBoxWindow.AddText( lpszAttributeValue );
+
+		} // End of successfully got attribute value
+
+		// Free string memory
+		delete [] lpszAttributeValue;
+
+	} // End of this is an anchor tag
+
+	// Free string memory
+	delete [] lpszTagName;
 
 } // End of function TagFunction
 
@@ -326,7 +364,7 @@ LRESULT CALLBACK MainWindowProcedure( HWND hWndMain, UINT uMessage, WPARAM wPara
 									LPTSTR lpszStatusMessage = new char[ STRING_LENGTH ];
 
 									// Process tags in local file
-									nTagCount = localFile.ProcessTags( HTML_FILE_CLASS_ANCHOR_TAG_NAME, HTML_FILE_CLASS_ANCHOR_TAG_ATTRIBUTE, lpszUrl, &TagFunction );
+									nTagCount = localFile.ProcessTags( lpszUrl, &TagFunction );
 
 									// Format status message
 									wsprintf( lpszStatusMessage, HTML_FILE_CLASS_PROCESS_TAGS_STATUS_MESSAGE_FORMAT_STRING, lpszUrl, nTagCount );
