@@ -17,10 +17,10 @@
 #include "..\Classes\FontClass.h"
 #include "..\Classes\HtmlFileClass.h"
 #include "..\Classes\InternetClass.h"
-#include "..\Classes\ListBoxWindowClass.h"
 #include "..\Classes\MessageClass.h"
 #include "..\Classes\MenuClass.h"
 #include "..\Classes\StatusBarWindowClass.h"
+#include "..\Classes\TreeViewWindowClass.h"
 #include "..\Classes\WindowClass.h"
 #include "..\Classes\WindowClassClass.h"
 

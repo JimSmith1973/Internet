@@ -18,6 +18,7 @@ g++ -mwindows -m64 -static -Wall -Wextra Internet.cpp ^
  ..\Classes\MenuClass.cpp ^
  ..\Classes\MessageClass.cpp ^
  ..\Classes\StatusBarWindowClass.cpp ^
+ ..\Classes\TreeViewWindowClass.cpp ^
  ..\Classes\WindowClass.cpp ^
  ..\Classes\WindowClassClass.cpp ^
  ^
