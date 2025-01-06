@@ -29,23 +29,36 @@ void TagFunction( LPCTSTR lpszParentUrl, LPCTSTR lpszTag )
 			// Allocate string memory
 			LPTSTR lpszAttributeValue = new char[ STRING_LENGTH ];
 
-			// Add tag to tree view window
-			g_treeViewWindow.InsertItem( lpszTag, TVI_ROOT, TVI_LAST );
-
 			// Get attribute value
 			if( htmlFile.GetAttributeValue( lpszTag, lpszParentUrl, HTML_FILE_CLASS_ANCHOR_TAG_ATTRIBUTE, lpszAttributeValue ) )
 			{
 				// Successfully got attribute value
 
 				// Add attribute value to tree view window
-				g_treeViewWindow.InsertItem( lpszAttributeValue, TVI_ROOT, TVI_LAST );
+				g_treeViewWindow.InsertItem( lpszAttributeValue, HTML_FILE_CLASS_ANCHOR_TAG_TITLE, TVI_LAST );
 
 			} // End of successfully got attribute value
+			else
+			{
+				// Unable to get attribute value
+
+				// Add tag to tree view window
+				g_treeViewWindow.InsertItem( lpszTag, HTML_FILE_CLASS_ANCHOR_TAG_TITLE, TVI_LAST );
+
+			} // End of unable to get attribute value
 
 			// Free string memory
 			delete [] lpszAttributeValue;
 
 		} // End of this is an anchor tag
+		else
+		{
+			// This is an unknown tag
+
+			// Add tag to tree view window
+			g_treeViewWindow.InsertItem( lpszTag, HTML_FILE_CLASS_UNKNOWN_TAG_TITLE, TVI_LAST );
+
+		} // End of this is an unknown tag
 
 	} // End of successfully got tag name
 
