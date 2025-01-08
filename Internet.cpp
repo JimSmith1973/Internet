@@ -9,6 +9,14 @@ ButtonWindow g_buttonWindow;
 TreeViewWindow g_treeViewWindow;
 StatusBarWindow g_statusBarWindow;
 
+BOOL SaveActionFunction( LPCTSTR lpszItemText )
+{
+	MessageBox( NULL, lpszItemText, INFORMATION_MESSAGE_CAPTION, ( MB_OK | MB_ICONINFORMATION ) );
+
+	return TRUE;
+
+} // End of function SaveActionFunction
+
 HTREEITEM TreeViewWindowAddItem( LPCTSTR lpszTag, LPCTSTR lpszParentUrl, LPCTSTR lpszAttributeName, LPCTSTR lpszTitle )
 {
 	HTREEITEM htiResult = NULL;
@@ -468,6 +476,17 @@ LRESULT CALLBACK MainWindowProcedure( HWND hWndMain, UINT uMessage, WPARAM wPara
 					break;
 
 				} // End of a button window command
+				case IDM_FILE_SAVE:
+				{
+					// A file save command
+
+					// 
+					g_treeViewWindow.ActionItemText( &SaveActionFunction );
+
+					// Break out of switch
+					break;
+
+				} // End of a file save command
 				case IDM_FILE_EXIT:
 				{
 					// A file exit command

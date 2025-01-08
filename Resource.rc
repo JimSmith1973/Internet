@@ -14,6 +14,8 @@ IDR_MAIN_MENU MENU
 	BEGIN
 	POPUP "&File"
 	BEGIN
+		MENUITEM "Save",														IDM_FILE_SAVE
+		MENUITEM SEPARATOR
 		MENUITEM "E&xit",														IDM_FILE_EXIT
 	END
 	POPUP "&Help"
