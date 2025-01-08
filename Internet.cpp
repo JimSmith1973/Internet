@@ -9,6 +9,40 @@ ButtonWindow g_buttonWindow;
 TreeViewWindow g_treeViewWindow;
 StatusBarWindow g_statusBarWindow;
 
+HTREEITEM TreeViewWindowAddItem( LPCTSTR lpszTag, LPCTSTR lpszParentUrl, LPCTSTR lpszAttributeName, LPCTSTR lpszTitle )
+{
+	HTREEITEM htiResult = NULL;
+
+	HtmlFile htmlFile;
+
+	// Allocate string memory
+	LPTSTR lpszAttributeValue = new char[ STRING_LENGTH ];
+
+	// Get attribute value
+	if( htmlFile.GetAttributeValue( lpszTag, lpszParentUrl, lpszAttributeName, lpszAttributeValue ) )
+	{
+		// Successfully got attribute value
+
+		// Add attribute value to tree view window
+		htiResult = g_treeViewWindow.InsertItem( lpszAttributeValue, lpszTitle );
+
+	} // End of successfully got attribute value
+	else
+	{
+		// Unable to get attribute value
+
+		// Add tag to tree view window
+		htiResult = g_treeViewWindow.InsertItem( lpszTag, lpszTitle );
+
+	} // End of unable to get attribute value
+
+	// Free string memory
+	delete [] lpszAttributeValue;
+
+	return htiResult;
+
+} // End of function TreeViewWindowAddItem
+
 void TagFunction( LPCTSTR lpszParentUrl, LPCTSTR lpszTag )
 {
 	HtmlFile htmlFile;
@@ -26,37 +60,31 @@ void TagFunction( LPCTSTR lpszParentUrl, LPCTSTR lpszTag )
 		{
 			// This is an anchor tag
 
-			// Allocate string memory
-			LPTSTR lpszAttributeValue = new char[ STRING_LENGTH ];
-
-			// Get attribute value
-			if( htmlFile.GetAttributeValue( lpszTag, lpszParentUrl, HTML_FILE_CLASS_ANCHOR_TAG_ATTRIBUTE, lpszAttributeValue ) )
-			{
-				// Successfully got attribute value
-
-				// Add attribute value to tree view window
-				g_treeViewWindow.InsertItem( lpszAttributeValue, HTML_FILE_CLASS_ANCHOR_TAG_TITLE, TVI_LAST );
-
-			} // End of successfully got attribute value
-			else
-			{
-				// Unable to get attribute value
-
-				// Add tag to tree view window
-				g_treeViewWindow.InsertItem( lpszTag, HTML_FILE_CLASS_ANCHOR_TAG_TITLE, TVI_LAST );
-
-			} // End of unable to get attribute value
-
-			// Free string memory
-			delete [] lpszAttributeValue;
+			// Add tag to tree view window
+			TreeViewWindowAddItem( lpszTag, lpszParentUrl, HTML_FILE_CLASS_ANCHOR_TAG_ATTRIBUTE, HTML_FILE_CLASS_ANCHOR_TAG_TITLE );
 
 		} // End of this is an anchor tag
+		else if( lstrcmpi( lpszTagName, HTML_FILE_CLASS_IMAGE_TAG_NAME ) == 0 )
+		{
+			// This is an image tag
+
+			// Add tag to tree view window
+			TreeViewWindowAddItem( lpszTag, lpszParentUrl, HTML_FILE_CLASS_IMAGE_TAG_ATTRIBUTE, HTML_FILE_CLASS_IMAGE_TAG_TITLE );
+
+		} // End of this is an image tag
 		else
 		{
 			// This is an unknown tag
 
-			// Add tag to tree view window
-			g_treeViewWindow.InsertItem( lpszTag, HTML_FILE_CLASS_UNKNOWN_TAG_TITLE, TVI_LAST );
+			// Ensure that this is not an end tag
+			if( lpszTagName[ 0 ] != HTML_FILE_CLASS_START_OF_END_TAG_NAME_CHARACTER )
+			{
+				// This is not an end tag
+
+				// Add tag to tree view window
+				g_treeViewWindow.InsertItem( lpszTag, HTML_FILE_CLASS_UNKNOWN_TAG_TITLE );
+
+			} // End of this is not an end tag
 
 		} // End of this is an unknown tag
 
