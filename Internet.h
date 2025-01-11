@@ -17,6 +17,7 @@
 #include "..\Classes\FontClass.h"
 #include "..\Classes\HtmlFileClass.h"
 #include "..\Classes\InternetClass.h"
+#include "..\Classes\ListBoxWindowClass.h"
 #include "..\Classes\MessageClass.h"
 #include "..\Classes\MenuClass.h"
 #include "..\Classes\StatusBarWindowClass.h"
@@ -34,6 +35,8 @@
 #define BUTTON_WINDOW_WIDTH														30
 #define BUTTON_WINDOW_HEIGHT													25
 #define BUTTON_WINDOW_ID														WM_USER
+
+#define LIST_BOX_WINDOW_HEIGHT													100
 
 #define EDIT_WINDOW_TEXT														"http://www.google.com"
 

@@ -6,6 +6,7 @@
 Internet g_internet;
 EditWindow g_editWindow;
 ButtonWindow g_buttonWindow;
+ListBoxWindow g_listBoxWindow;
 TreeViewWindow g_treeViewWindow;
 StatusBarWindow g_statusBarWindow;
 
@@ -19,8 +20,8 @@ BOOL DownloadFile( LPCTSTR lpszUrl, LPTSTR lpszLocalFilePath )
 	// Format status message
 	wsprintf( lpszStatusMessage, INTERNET_CLASS_DOWNLOADING_STATUS_MESSAGE_FORMAT_STRING, lpszUrl );
 
-	// Show status message on status bar window
-	g_statusBarWindow.SetText( lpszStatusMessage );
+	// Show status message on list box window
+	g_listBoxWindow.AddTextEx( lpszStatusMessage );
 
 	// Download url to local file
 	if( g_internet.DownloadFile( lpszUrl, lpszLocalFilePath ) )
@@ -43,8 +44,8 @@ BOOL DownloadFile( LPCTSTR lpszUrl, LPTSTR lpszLocalFilePath )
 
 	} // End of unable to download url to local file
 
-	// Show status message on status bar window
-	g_statusBarWindow.SetText( lpszStatusMessage );
+	// Show status message on list box window
+	g_listBoxWindow.AddTextEx( lpszStatusMessage );
 
 	// Free string memory
 	delete [] lpszStatusMessage;
@@ -274,18 +275,28 @@ LRESULT CALLBACK MainWindowProcedure( HWND hWndMain, UINT uMessage, WPARAM wPara
 						// Set tree view window font
 						g_treeViewWindow.SetFont( font );
 
-						// Create status bar window
-						if( g_statusBarWindow.Create( hWndMain, hInstance ) )
+						// Create list box window
+						if( g_listBoxWindow.Create( hWndMain, hInstance ) )
 						{
-							// Successfully created status bar window
+							// Successfully created list box window
 
-							// Set status bar window font
-							g_statusBarWindow.SetFont( font );
+							// Set list box window font
+							g_listBoxWindow.SetFont( font );
 
-							// Select edit window text
-							g_editWindow.SelectText();
+							// Create status bar window
+							if( g_statusBarWindow.Create( hWndMain, hInstance ) )
+							{
+								// Successfully created status bar window
 
-						} // End of successfully created status bar window
+								// Set status bar window font
+								g_statusBarWindow.SetFont( font );
+
+								// Select edit window text
+								g_editWindow.SelectText();
+
+							} // End of successfully created status bar window
+
+						} // End of successfully created list box window
 
 					} // End of successfully created tree view window
 
@@ -308,6 +319,7 @@ LRESULT CALLBACK MainWindowProcedure( HWND hWndMain, UINT uMessage, WPARAM wPara
 			int nStatusWindowHeight;
 			int nTreeViewWindowHeight;
 			int nTreeViewWindowTop;
+			int nListBoxWindowTop;
 
 			// Store client width and height
 			nClientWidth	= ( int )LOWORD( lParam );
@@ -321,17 +333,19 @@ LRESULT CALLBACK MainWindowProcedure( HWND hWndMain, UINT uMessage, WPARAM wPara
 
 			// Calculate window sizes
 			nStatusWindowHeight		= ( rcStatus.bottom - rcStatus.top );
-			nTreeViewWindowHeight	= ( nClientHeight - ( nStatusWindowHeight + BUTTON_WINDOW_HEIGHT ) + WINDOW_BORDER_HEIGHT );
+			nTreeViewWindowHeight	= ( nClientHeight - ( BUTTON_WINDOW_HEIGHT + LIST_BOX_WINDOW_HEIGHT + nStatusWindowHeight ) + WINDOW_BORDER_HEIGHT + WINDOW_BORDER_HEIGHT );
 			nEditWindowWidth		= ( ( nClientWidth - BUTTON_WINDOW_WIDTH ) + WINDOW_BORDER_WIDTH );
 
 			// Calculate window positions
 			nTreeViewWindowTop		= ( BUTTON_WINDOW_HEIGHT - WINDOW_BORDER_HEIGHT );
 			nButtonWindowLeft		= ( nEditWindowWidth - WINDOW_BORDER_WIDTH );
+			nListBoxWindowTop		= ( ( nTreeViewWindowTop + nTreeViewWindowHeight ) - WINDOW_BORDER_HEIGHT );
 
 			// Move control windows
 			g_editWindow.Move( 0, 0, nEditWindowWidth, BUTTON_WINDOW_HEIGHT, TRUE );
 			g_buttonWindow.Move( nButtonWindowLeft, 0, BUTTON_WINDOW_WIDTH, BUTTON_WINDOW_HEIGHT, TRUE );
 			g_treeViewWindow.Move( 0, nTreeViewWindowTop, nClientWidth, nTreeViewWindowHeight, TRUE );
+			g_listBoxWindow.Move( 0, nListBoxWindowTop, nClientWidth, LIST_BOX_WINDOW_HEIGHT, TRUE );
 
 			// Break out of switch
 			break;
