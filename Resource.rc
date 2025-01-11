@@ -14,7 +14,7 @@ IDR_MAIN_MENU MENU
 	BEGIN
 	POPUP "&File"
 	BEGIN
-		MENUITEM "Save",														IDM_FILE_SAVE
+		MENUITEM "Download",													IDM_FILE_DOWNLOAD
 		MENUITEM SEPARATOR
 		MENUITEM "E&xit",														IDM_FILE_EXIT
 	END

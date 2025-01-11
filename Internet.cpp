@@ -9,13 +9,73 @@ ButtonWindow g_buttonWindow;
 TreeViewWindow g_treeViewWindow;
 StatusBarWindow g_statusBarWindow;
 
-BOOL SaveActionFunction( LPCTSTR lpszItemText )
+BOOL DownloadFile( LPCTSTR lpszUrl, LPTSTR lpszLocalFilePath )
 {
-	MessageBox( NULL, lpszItemText, INFORMATION_MESSAGE_CAPTION, ( MB_OK | MB_ICONINFORMATION ) );
+	BOOL bResult = FALSE;
 
-	return TRUE;
+	// Allocate string memory
+	LPTSTR lpszStatusMessage = new char[ STRING_LENGTH + sizeof( char ) ];
 
-} // End of function SaveActionFunction
+	// Format status message
+	wsprintf( lpszStatusMessage, INTERNET_CLASS_DOWNLOADING_STATUS_MESSAGE_FORMAT_STRING, lpszUrl );
+
+	// Show status message on status bar window
+	g_statusBarWindow.SetText( lpszStatusMessage );
+
+	// Download url to local file
+	if( g_internet.DownloadFile( lpszUrl, lpszLocalFilePath ) )
+	{
+		// Successfully downloaded url to local file
+
+		// Format status message
+		wsprintf( lpszStatusMessage, INTERNET_CLASS_SUCCESSFULLY_DOWNLOADED_STATUS_MESSAGE_FORMAT_STRING, lpszUrl, lpszLocalFilePath );
+
+		// Update return value
+		bResult = TRUE;
+
+	} // End of successfully downloaded url to local file
+	else
+	{
+		// Unable to download url to local file
+
+		// Format status message
+		wsprintf( lpszStatusMessage, INTERNET_CLASS_UNABLE_TO_DOWNLOAD_STATUS_MESSAGE_FORMAT_STRING, lpszUrl );
+
+	} // End of unable to download url to local file
+
+	// Show status message on status bar window
+	g_statusBarWindow.SetText( lpszStatusMessage );
+
+	// Free string memory
+	delete [] lpszStatusMessage;
+
+	return bResult;
+
+} // End of function DownloadFile
+
+BOOL DownloadFile( LPCTSTR lpszUrl )
+{
+	BOOL bResult;
+
+	// Allocate string memory
+	LPTSTR lpszLocalFilePath = new char[ STRING_LENGTH + sizeof( char ) ];
+
+	// Download file
+	bResult = DownloadFile( lpszUrl, lpszLocalFilePath );
+
+	// Free string memory
+	delete [] lpszLocalFilePath;
+
+	return bResult;
+
+} // End of function DownloadFile
+
+BOOL DownloadActionFunction( LPCTSTR lpszItemText )
+{
+	// Download item
+	return DownloadFile( lpszItemText );
+
+} // End of function DownloadActionFunction
 
 HTREEITEM TreeViewWindowAddItem( LPCTSTR lpszTag, LPCTSTR lpszParentUrl, LPCTSTR lpszAttributeName, LPCTSTR lpszTitle )
 {
@@ -102,50 +162,6 @@ void TagFunction( LPCTSTR lpszParentUrl, LPCTSTR lpszTag )
 	delete [] lpszTagName;
 
 } // End of function TagFunction
-
-BOOL DownloadFile( LPCTSTR lpszUrl, LPTSTR lpszLocalFilePath )
-{
-	BOOL bResult = FALSE;
-
-	// Allocate string memory
-	LPTSTR lpszStatusMessage = new char[ STRING_LENGTH + sizeof( char ) ];
-
-	// Format status message
-	wsprintf( lpszStatusMessage, INTERNET_CLASS_DOWNLOADING_STATUS_MESSAGE_FORMAT_STRING, lpszUrl );
-
-	// Show status message on status bar window
-	g_statusBarWindow.SetText( lpszStatusMessage );
-
-	// Download url to local file
-	if( g_internet.DownloadFile( lpszUrl, lpszLocalFilePath ) )
-	{
-		// Successfully downloaded url to local file
-
-		// Format status message
-		wsprintf( lpszStatusMessage, INTERNET_CLASS_SUCCESSFULLY_DOWNLOADED_STATUS_MESSAGE_FORMAT_STRING, lpszUrl, lpszLocalFilePath );
-
-		// Update return value
-		bResult = TRUE;
-
-	} // End of successfully downloaded url to local file
-	else
-	{
-		// Unable to download url to local file
-
-		// Format status message
-		wsprintf( lpszStatusMessage, INTERNET_CLASS_UNABLE_TO_DOWNLOAD_STATUS_MESSAGE_FORMAT_STRING, lpszUrl );
-
-	} // End of unable to download url to local file
-
-	// Show status message on status bar window
-	g_statusBarWindow.SetText( lpszStatusMessage );
-
-	// Free string memory
-	delete [] lpszStatusMessage;
-
-	return bResult;
-
-} // End of function DownloadFile
 
 void EditWindowUpdateFunction( int nTextLength )
 {
@@ -476,12 +492,74 @@ LRESULT CALLBACK MainWindowProcedure( HWND hWndMain, UINT uMessage, WPARAM wPara
 					break;
 
 				} // End of a button window command
-				case IDM_FILE_SAVE:
+				case IDM_FILE_DOWNLOAD:
 				{
-					// A file save command
+					// A file download command
+					HTREEITEM htiSelected;
 
-					// 
-					g_treeViewWindow.ActionItemText( &SaveActionFunction );
+					// Get selected tree item
+					htiSelected = g_treeViewWindow.GetSelectedItem();
+
+					// Ensure that selected tree item was got
+					if( htiSelected )
+					{
+						// Successfully got selected tree item
+
+						// Allocate string memory
+						LPTSTR lpszStatusMessage = new char[ STRING_LENGTH ];
+
+						// See if selected tree item has children
+						if( g_treeViewWindow.HasChildren( htiSelected ) )
+						{
+							// Selected tree item has children
+							int nResult;
+
+							// Download child items
+							nResult = g_treeViewWindow.ActionChildItemText( &DownloadActionFunction );
+
+							// Format status message
+							wsprintf( lpszStatusMessage, SUCCESSFULLY_DOWNLOADED_ITEMS_STATUS_MESSAGE_FORMAT_STRING, nResult );
+
+						} // End of selected tree item has children
+						else
+						{
+							// Selected tree item has no children
+
+							// Download item
+							if( g_treeViewWindow.ActionItemText( &DownloadActionFunction ) )
+							{
+								// Successfully downloaded item
+
+								// Update status message
+								lstrcpy( lpszStatusMessage, SUCCESSFULLY_DOWNLOADED_ITEM_STATUS_MESSAGE );
+
+							} // End of successfully downloaded item
+							else
+							{
+								// Unable to download item
+
+								// Update status message
+								lstrcpy( lpszStatusMessage, UNABLE_TO_DOWNLOAD_ITEM_STATUS_MESSAGE );
+
+							} // End of unable to download item
+
+						} // End of selected tree item has no children
+
+						// Show status message on status bar window
+						g_statusBarWindow.SetText( lpszStatusMessage );
+
+						// Free string memory
+						delete [] lpszStatusMessage;
+
+					} // End of successfully got selected tree item
+					else
+					{
+						// Unable to get selected tree item
+
+						// Display error message
+						MessageBox( hWndMain, TREE_VIEW_WINDOW_CLASS_UNABLE_TO_GET_SELECTED_ITEM_ERROR_MESSAGE, ERROR_MESSAGE_CAPTION, ( MB_OK | MB_ICONERROR ) );
+
+					} // End of unable to get selected tree item
 
 					// Break out of switch
 					break;

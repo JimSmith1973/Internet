@@ -42,3 +42,7 @@
 																				"Written by Jim Smith\r\n"			\
 																				"\r\n"								\
 																				"January 2025"
+
+#define SUCCESSFULLY_DOWNLOADED_ITEMS_STATUS_MESSAGE_FORMAT_STRING				"Successfully downloaded %d items"
+#define SUCCESSFULLY_DOWNLOADED_ITEM_STATUS_MESSAGE								"Successfully downloaded item"
+#define UNABLE_TO_DOWNLOAD_ITEM_STATUS_MESSAGE									"Unable to download item"
