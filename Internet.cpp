@@ -243,12 +243,51 @@ LRESULT CALLBACK MainWindowProcedure( HWND hWndMain, UINT uMessage, WPARAM wPara
 		{
 			// A create message
 			HINSTANCE hInstance;
+			LPTSTR lpszUrl = NULL;
+			DWORD dwClipboardTextLength;
+			Clipboard clipboard;
+
+			// Get clipboard text length
+			dwClipboardTextLength = clipboard.GetTextLength();
+
+			// See if clipboard contains text
+			if( dwClipboardTextLength > 0 )
+			{
+				// Clipboard contains text
+
+				// Allocate string memory
+				lpszUrl = new char[ dwClipboardTextLength + sizeof( char ) ];
+
+				// Get url from clipboard
+				if( !( clipboard.GetText( lpszUrl ) ) )
+				{
+					// Unable to get url from clipboard
+
+					// Free string memory
+					delete [] lpszUrl;
+
+				} // End of unable to get url from clipboard
+
+			} // End of clipboard contains text
+
+			// Ensure that url is valid
+			if( !( lpszUrl ) )
+			{
+				// Url is not valid
+
+				// Allocate string memory
+				lpszUrl = new char[ STRING_LENGTH + sizeof( char ) ];
+
+				// Set default url
+				lstrcpy( lpszUrl, EDIT_WINDOW_DEFAULT_URL );
+
+			} // End of url is not valid
 
 			// Get instance
 			hInstance = ( ( LPCREATESTRUCT )lParam )->hInstance;
 
 			// Create edit window
-			if( g_editWindow.Create( hWndMain, hInstance, EDIT_WINDOW_TEXT ) )
+			if( g_editWindow.Create( hWndMain, hInstance, lpszUrl ) )
 			{
 				// Successfully created edit window
 				Font font;
@@ -303,6 +342,9 @@ LRESULT CALLBACK MainWindowProcedure( HWND hWndMain, UINT uMessage, WPARAM wPara
 				} // End of successfully created button window
 
 			} // End of successfully created edit window
+
+			// Free string memory
+			delete [] lpszUrl;
 
 			// Break out of switch
 			break;

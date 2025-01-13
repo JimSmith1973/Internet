@@ -12,6 +12,7 @@
 
 #include "..\Classes\ArgumentListClass.h"
 #include "..\Classes\ButtonWindowClass.h"
+#include "..\Classes\ClipboardClass.h"
 #include "..\Classes\DroppedFilesClass.h"
 #include "..\Classes\EditWindowClass.h"
 #include "..\Classes\FontClass.h"
@@ -38,7 +39,7 @@
 
 #define LIST_BOX_WINDOW_HEIGHT													100
 
-#define EDIT_WINDOW_TEXT														"http://www.google.com"
+#define EDIT_WINDOW_DEFAULT_URL													"http://www.google.com"
 
 #define ABOUT_MESSAGE_TEXT														"Internet\r\n"						\
 																				"\r\n"								\

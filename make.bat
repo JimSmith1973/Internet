@@ -8,6 +8,7 @@ g++ -mwindows -m64 -static -Wall -Wextra Internet.cpp ^
  ^
  ..\Classes\ArgumentListClass.cpp ^
  ..\Classes\ButtonWindowClass.cpp ^
+ ..\Classes\ClipboardClass.cpp ^
  ..\Classes\DroppedFilesClass.cpp ^
  ..\Classes\EditWindowClass.cpp ^
  ..\Classes\FileClass.cpp ^
